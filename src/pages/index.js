@@ -1,8 +1,47 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import styles from '../styles/Home.module.css'
+import Head from "next/head";
+import Image from "next/image";
+import styles from "../../styles/Home.module.css";
+import { Observer, Scheduler, oakConstants } from "oak-js-library";
+import { ApiPromise, WsProvider } from "@polkadot/api";
+import useConnect from "../utils/connect";
 
 export default function Home() {
+  // const results = Observer.getAutomationTimeTaskQueue();
+  // console.log(results);
+  // const allSchedules = async () => {
+  //   return await await new Observer(oakConstants.OakChains.STURN);
+  // };
+  // console.log(allSchedules());
+  const { connect } = useConnect();
+
+  // The actual address that we will use
+  const ADDR = "5F455gZ12syJ1smg5bd7kS4A1DGEDFeH9jrikjRyu4yDxL43";
+
+  async function retrieveLastTimeStamp() {
+    // Do something
+    // console.log(api.genesisHash.toHex());
+
+    const observer = new Observer(oakConstants.OakChains.TUR);
+
+    const lastTimeSlot = await observer.getAutomationTimeLastTimeSlot();
+    console.log("lastTimeSlot", lastTimeSlot);
+
+    const missedQueueTasks = await observer.getAutomationTimeMissedQueue();
+    console.log("missedQueueTasks", missedQueueTasks);
+
+    const taskQueueTaskHashes = await observer.getAutomationTimeTaskQueue();
+    console.log("taskQueueTaskHashes", taskQueueTaskHashes);
+
+    const timeSlot = 1656583200000; // translates to Wed May 04 2022 04:00:00 GMT+0000
+    const scheduledTasks = await observer.getAutomationTimeScheduledTasks(
+      timeSlot
+    );
+    console.log("scheduledTasks", scheduledTasks);
+  }
+
+  retrieveLastTimeStamp();
+  connect();
+
   return (
     <div className={styles.container}>
       <Head>
@@ -17,7 +56,7 @@ export default function Home() {
         </h1>
 
         <p className={styles.description}>
-          Get started by editing{' '}
+          Get started by editing{" "}
           <code className={styles.code}>pages/index.js</code>
         </p>
 
@@ -58,12 +97,12 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Powered by{' '}
+          Powered by{" "}
           <span className={styles.logo}>
             <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
           </span>
         </a>
       </footer>
     </div>
-  )
+  );
 }
