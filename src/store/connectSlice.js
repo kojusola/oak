@@ -21,7 +21,6 @@ export const connectSlice = createSlice({
   },
 });
 
-// Action creators are generated for each case reducer function
 export const { connect, disConnect } = connectSlice.actions;
 
 export default connectSlice.reducer;
