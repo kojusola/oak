@@ -6,7 +6,7 @@ const initialState = {
 };
 
 export const connectSlice = createSlice({
-  name: "counter",
+  name: "connect",
   initialState,
   reducers: {
     connect: (state) => {
