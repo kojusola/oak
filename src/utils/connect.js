@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { connect, disConnect, setAddress } from "../store/connectSlice";
+import {
+  connectPolkadot,
+  disConnectPolkadot,
+  setAddress,
+} from "../store/connectSlice";
 const { ApiPromise, WsProvider } = require("@polkadot/api");
 import { toast } from "react-toastify";
 
@@ -27,7 +31,7 @@ export default function useConnect() {
       toast.error("Please enable the Polkadot extension");
       return;
     } else {
-      //   dispatch(connect());
+      await dispatch(connectPolkadot());
       toast.success("Connected to the Polkadot extension");
     }
 
@@ -36,33 +40,35 @@ export default function useConnect() {
       toast.error("Please add an account to your browser");
       return;
     } else {
+      console.log("allAccounts", allAccounts);
       const address = allAccounts[0].address;
-      //   dispatch(setAddress(allAccounts[0].address));
+      dispatch(setAddress(address));
     }
-    const api = await ApiPromise.create();
 
-    console.log(connected, address);
-    let {
-      data: { free: previousFree },
-      nonce: previousNonce,
-    } = await api.query.system.account(allAccounts);
-    console.log(
-      `${allAccounts} has a balance of ${previousFree}, nonce ${previousNonce}`
-    );
-    console.log(
-      `You may leave this example running and start example 06 or transfer any value to ${allAccounts}`
-    );
-    api.query.system.account(
-      allAccounts,
-      ({ data: { free: currentFree }, nonce: currentNonce }) => {
-        const change = currentFree.sub(previousFree);
-        if (!change.isZero()) {
-          console.log(`New balance change of ${change}, nonce ${currentNonce}`);
-          previousFree = currentFree;
-          previousNonce = currentNonce;
-        }
-      }
-    );
+    console.log("state:", connected, address);
+
+    // const api = await ApiPromise.create();
+    // let {
+    //   data: { free: previousFree },
+    //   nonce: previousNonce,
+    // } = await api.query.system.account(allAccounts);
+    // console.log(
+    //   `${allAccounts} has a balance of ${previousFree}, nonce ${previousNonce}`
+    // );
+    // console.log(
+    //   `You may leave this example running and start example 06 or transfer any value to ${allAccounts}`
+    // );
+    // api.query.system.account(
+    //   allAccounts,
+    //   ({ data: { free: currentFree }, nonce: currentNonce }) => {
+    //     const change = currentFree.sub(previousFree);
+    //     if (!change.isZero()) {
+    //       console.log(`New balance change of ${change}, nonce ${currentNonce}`);
+    //       previousFree = currentFree;
+    //       previousNonce = currentNonce;
+    //     }
+    //   }
+    // );
   }
 
   return {
