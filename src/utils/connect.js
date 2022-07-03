@@ -26,7 +26,7 @@ export default function useConnect() {
     if (
       extensions &&
       extensions.length === 0 &&
-      extensions[0].name !== "polkadot-js"
+      extensions[0]?.name !== "polkadot-js"
     ) {
       toast.error("Please enable the Polkadot extension");
       return;
@@ -41,7 +41,7 @@ export default function useConnect() {
       return;
     } else {
       console.log("allAccounts", allAccounts);
-      const address = allAccounts[0].address;
+      const address = allAccounts[0]?.address;
       dispatch(setAddress(address));
     }
 

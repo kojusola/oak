@@ -4,6 +4,7 @@ import styles from "../../styles/Home.module.css";
 import { Observer, Scheduler, oakConstants } from "oak-js-library";
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import useConnect from "../utils/connect";
+import useTask from "../utils/tasks";
 
 export default function Home() {
   // const results = Observer.getAutomationTimeTaskQueue();
@@ -13,34 +14,12 @@ export default function Home() {
   // };
   // console.log(allSchedules());
   const { connect } = useConnect();
-
-  // The actual address that we will use
-  const ADDR = "5F455gZ12syJ1smg5bd7kS4A1DGEDFeH9jrikjRyu4yDxL43";
-
-  async function retrieveLastTimeStamp() {
-    // Do something
-    // console.log(api.genesisHash.toHex());
-
-    const observer = new Observer(oakConstants.OakChains.TUR);
-
-    const lastTimeSlot = await observer.getAutomationTimeLastTimeSlot();
-    console.log("lastTimeSlot", lastTimeSlot);
-
-    const missedQueueTasks = await observer.getAutomationTimeMissedQueue();
-    console.log("missedQueueTasks", missedQueueTasks);
-
-    const taskQueueTaskHashes = await observer.getAutomationTimeTaskQueue();
-    console.log("taskQueueTaskHashes", taskQueueTaskHashes);
-
-    const timeSlot = 1656583200000; // translates to Wed May 04 2022 04:00:00 GMT+0000
-    const scheduledTasks = await observer.getAutomationTimeScheduledTasks(
-      timeSlot
-    );
-    console.log("scheduledTasks", scheduledTasks);
+  const { getAllTask } = useTask();
+  async function run() {
+    await connect();
+    await getAllTask();
   }
-
-  retrieveLastTimeStamp();
-  connect();
+  run();
 
   return (
     <div className={styles.container}>
