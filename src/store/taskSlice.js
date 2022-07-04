@@ -1,21 +1,41 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { ApiClient } from "./axiosClient";
 import { formatSuccessResponse, formatErrorResponse } from "../utils/functions";
 
 const limit = 10;
 
 const initialState = {
-  allTasks: null,
+  allTasks: [],
+  loading: false,
+  scheduleLoading: false,
+  error: null,
 };
 
-const apiCall = async (url, method, body, state) => {
+export const fetchAllTask = createAsyncThunk(
+  "task/getTasks",
+  async (data, thunkAPI) => {
+    return await apiCall(
+      `/task/get-tasks-for-address?address=${data?.address}`,
+      "GET",
+      {}
+    );
+  }
+);
+
+export const scheduleTask = createAsyncThunk(
+  "task/scheduleTasks",
+  async (data, thunkAPI) => {
+    return await apiCall(`/task/schedule-task`, "POST", data);
+  }
+);
+
+const apiCall = async (url, method, body) => {
   console.log(1);
   if (method === "GET") {
     try {
-      console.log(state.allTasks);
       const response = await ApiClient.get(url);
       formatSuccessResponse(response);
-      return (state.allTasks = response);
+      return response;
     } catch (error) {
       return formatErrorResponse(error);
     }
@@ -35,24 +55,29 @@ const apiCall = async (url, method, body, state) => {
 export const taskSlice = createSlice({
   name: "task",
   initialState,
-  reducers: {
-    getTasks: (state, actions) => {
-      console.log("actions", actions);
-      const results = apiCall(
-        `/task/get-tasks-for-address?address=5F455gZ12syJ1smg5bd7kS4A1DGEDFeH9jrikjRyu4yDxL88`,
-        "GET",
-        {},
-        state
-      );
-      // state.allTasks = results;
-    },
-    scheduleTasks: (state, actions) => {
-      console.log("actions", actions);
-      apiCall(`/task/schedule-task`, "POST", actions.payload);
-    },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder.addCase(fetchAllTask.pending, (state, action) => {
+      state.loading = true;
+    });
+    builder.addCase(fetchAllTask.fulfilled, (state, action) => {
+      state.loading = false;
+      state.allTasks = action.payload;
+    });
+    builder.addCase(fetchAllTask.rejected, (state, action) => {
+      state.loading = false;
+      state.error = "An error occurred";
+    });
+    builder.addCase(scheduleTask.fulfilled, (state, action) => {
+      state.scheduleLoading = false;
+    });
+    builder.addCase(scheduleTask.rejected, (state, action) => {
+      state.scheduleLoading = false;
+      state.error = "An error occurred";
+    });
   },
 });
 
-export const { getTasks, scheduleTasks } = taskSlice.actions;
+export const { scheduleTasks } = taskSlice.actions;
 
 export default taskSlice.reducer;

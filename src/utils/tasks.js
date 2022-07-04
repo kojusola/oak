@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getTasks, scheduleTasks } from "../store/taskSlice";
+import { fetchAllTask, scheduleTasks } from "../store/taskSlice";
 import { Observer, Scheduler, oakConstants } from "oak-js-library";
 const { ApiPromise, WsProvider } = require("@polkadot/api");
 import { toast } from "react-toastify";
@@ -13,7 +13,7 @@ export default function useTask() {
 
   // connecting to the extension
   async function getAllTask() {
-    await dispatch(getTasks({ address }));
+    await dispatch(fetchAllTask({ address }));
     console.log("alltask state:", allTasks);
   }
 
